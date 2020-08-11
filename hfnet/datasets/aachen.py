@@ -14,7 +14,7 @@ class Aachen(BaseDataset):
         'resize_max': 640,
         'num_parallel_calls': 10,
     }
-    dataset_folder = 'aachen/images_upright'
+    dataset_folder = 'aachen/image'
 
     def _init_dataset(self, **config):
         tf.data.Dataset.map_parallel = lambda self, fn: self.map(

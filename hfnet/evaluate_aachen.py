@@ -7,7 +7,7 @@ import numpy as np
 from pyquaternion import Quaternion
 
 from hfnet.evaluation.localization import Localization, evaluate
-from hfnet.evaluation.loaders import export_loader
+from hfnet.evaluation.loaders import export_loader,export_loader_db
 from hfnet.settings import EXPER_PATH
 
 
@@ -15,6 +15,7 @@ configs_global = {
     'netvlad': {
         'db_name': 'globaldb_netvlad.pkl',
         'experiment': 'netvlad/aachen',
+        'predictor_db': export_loader_db,
         'predictor': export_loader,
         'has_keypoints': False,
         'has_descriptors': False,
@@ -24,6 +25,7 @@ configs_global = {
     'hfnet': {
         'db_name': 'globaldb_hfnet.pkl',
         'experiment':  'hfnet/aachen',
+        'predictor_db': export_loader_db,
         'predictor': export_loader,
         'has_keypoints': False,
         'has_descriptors': False,
@@ -36,6 +38,7 @@ configs_local = {
     'superpoint': {
         'db_name': 'localdb_superpoint.pkl',
         'experiment': 'superpoint/aachen',
+        'predictor_db': export_loader_db,
         'predictor': export_loader,
         'has_keypoints': True,
         'has_descriptors': True,
@@ -48,6 +51,7 @@ configs_local = {
     'hfnet': {
         'db_name': 'localdb_hfnet.pkl',
         'experiment':  'hfnet/aachen',
+        'predictor_db': export_loader_db,
         'predictor': export_loader,
         'has_keypoints': True,
         'has_descriptors': True,
@@ -79,6 +83,7 @@ configs_local = {
     'netvlad': {
         'db_name': 'localdb_netvlad_kpts-sp-nms4.pkl',
         'experiment': 'netvlad/aachen',
+        'predictor_db': export_loader_db,
         'predictor': export_loader,
         'keypoint_predictor': export_loader,
         'keypoint_config': {
@@ -103,14 +108,14 @@ config_aachen = {
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('model', type=str)
-    parser.add_argument('eval_name', type=str)
+    parser.add_argument('model', type=str)#sfm
+    parser.add_argument('eval_name', type=str)#输出名字
     parser.add_argument('--local_method', type=str)
     parser.add_argument('--global_method', type=str)
-    parser.add_argument('--build_db', action='store_true')
-    parser.add_argument('--queries', type=str, default='day_time')
+    parser.add_argument('--build_db', action='store_true',default='True')
+    parser.add_argument('--queries', type=str, default='querylist')#查询图像名列表
     parser.add_argument('--max_iter', type=int)
-    parser.add_argument('--export_poses', action='store_true')
+    parser.add_argument('--export_poses', action='store_true',default='True')
     parser.add_argument('--cpp_backend', action='store_true')
     args = parser.parse_args()
 
@@ -129,7 +134,7 @@ if __name__ == '__main__':
     logging.info('Evaluating Aachen with configuration: ')
     loc = Localization('aachen', args.model, config, build_db=args.build_db)
 
-    query_file = f'{args.queries}_queries_with_intrinsics.txt'
+    query_file = f'{args.queries}.txt'
     queries, query_dataset = loc.init_queries(query_file, config_aachen)
 
     logging.info('Starting evaluation')

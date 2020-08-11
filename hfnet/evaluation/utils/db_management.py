@@ -66,7 +66,7 @@ def build_localization_dbs(db_ids, images, cameras,
     for i, (image_id, data) in tqdm(enumerate(zip(db_ids, db_iter))):
         # Global
         if config_global is not None:
-            pred = config_global['predictor'](
+            pred = config_global['predictor_db'](
                 data['image'], data['name'], **config_global)
             desc = pred['global_descriptor']
             if global_descriptors is None:
@@ -79,13 +79,13 @@ def build_localization_dbs(db_ids, images, cameras,
             valid = db_item.point3D_ids > 0
             kpts = db_item.xys[valid] - 0.5  # Colmap -> CV convention
 
-            if 'predictor' in config_local:
+            if 'predictor_db' in config_local:
                 # Kind of hacky but that's for the sake of reusability
                 config = config_local.copy()
                 config['num_features'] = 0  # keep all features
                 config['keypoint_predictor'] = lambda im, n, **kwargs: {
                     'keypoints': kpts, 'scores': None}
-                pred = config_local['predictor'](
+                pred = config_local['predictor_db'](
                     data['image'], data['name'], **config)
                 desc = pred['descriptors']
             elif 'colmap_db' in config_local:
