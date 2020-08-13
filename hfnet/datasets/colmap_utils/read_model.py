@@ -76,6 +76,7 @@ def read_next_bytes(fid, num_bytes, format_char_sequence, endian_character="<"):
     :return: Tuple of read and unpacked values.
     """
     data = fid.read(num_bytes)
+    #print(len(data))
     return struct.unpack(endian_character + format_char_sequence, data)
 
 

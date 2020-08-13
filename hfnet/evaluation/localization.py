@@ -28,7 +28,7 @@ class Localization:
 
         logging.info(f'Importing COLMAP model {model_name}')
         self.cameras, self.images, self.points = read_model(
-            path=Path(base_path, 'models', model_name).as_posix(), ext='.bin')
+            path=Path(base_path, 'models', model_name).as_posix(), ext='.txt')
         self.db_ids = np.array(list(self.images.keys()))
         self.db_names = [self.images[i].name for i in self.db_ids]
 
