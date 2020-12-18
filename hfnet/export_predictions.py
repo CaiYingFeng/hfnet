@@ -76,7 +76,8 @@ import logging
 from pathlib import Path
 from tqdm import tqdm
 from pprint import pformat
-
+import h5py
+import os
 logging.basicConfig(format='[%(asctime)s %(levelname)s] %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
@@ -87,6 +88,7 @@ from hfnet.settings import EXPER_PATH, DATA_PATH  # noqa: E402
 
 
 if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     parser = argparse.ArgumentParser()
     parser.add_argument('method',type=str)
 
@@ -125,6 +127,13 @@ if __name__ == '__main__':
         exper_name=''
         myconfig='hfnet/configs/netvlad_export_aachen.yaml'
         mykeys='global_descriptor'
+    if method=='superpoint':
+        export_name = 'google_landmarks/superpoint_predictions'
+        exper_name=''
+        myconfig='hfnet/configs/superpoint_export_distill.yaml'
+        mykeys='local_descriptor_map,dense_scores'
+
+    
 
     
 
@@ -171,12 +180,37 @@ if __name__ == '__main__':
         dataset = get_dataset(config['data']['name'])(**config['data'])
        
         test_set = dataset.get_test_set()
-        
+
+        feature_file = h5py.File(Path(base_dir, 'all_1.h5'), 'a')#生成h5所需
+
         for data in tqdm(test_set):
-            
+            # print (data)
+            # break
             # print(name)
+
             predictions = net.predict(data, keys=keys)
             predictions['input_shape'] = data['image'].shape
             name = data['name'].decode('utf-8')
-            Path(base_dir, Path(name).parent).mkdir(parents=True, exist_ok=True)
-            np.savez(Path(base_dir, '{}.npz'.format(name)), **predictions)
+            # Path(base_dir, Path(name).parent).mkdir(parents=True, exist_ok=True)
+            # np.savez(Path(base_dir, '{}.npz'.format(name)), **predictions)
+
+            ###########################
+            ###生成pairs需要的h5文件####
+            ###########################
+
+            if(name.split('.',-1)[-1]=='jpg'):
+                name+='.png'
+            else:
+                name+='.jpg'
+
+            grp=feature_file.create_group(name)
+            grp.create_dataset('global_descriptor',data=predictions['global_descriptor'])
+            grp.create_dataset('input_shape',data=predictions['input_shape'])
+            break
+
+            ##########################
+            ##########################
+            ##########################
+        
+        feature_file.close()
+    

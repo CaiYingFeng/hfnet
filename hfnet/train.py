@@ -79,4 +79,5 @@ if __name__ == '__main__':
         os.mkdir(output_dir)
 
     with capture_outputs(os.path.join(output_dir, 'log')):
+        print("1")
         _cli_train(config, output_dir)

@@ -47,6 +47,8 @@ class Distillation(BaseDataset):
         if config['load_targets']:
             for i, target in enumerate(config['targets']):
                 for im in config['image_dirs']:
+                    print(Path(Path(DATA_PATH, im).parent,target['dir']))
+                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     assert Path(Path(DATA_PATH, im).parent,
                                 target['dir']).exists()
                 data[i] = []

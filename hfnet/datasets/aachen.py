@@ -27,10 +27,13 @@ class Aachen(BaseDataset):
             search = []
             if config['load_db']:
                 search.append(Path(base_path, 'db'))
+                #search.append(Path("/media/autolab/disk_3T/caiyingfeng/huawei/0808/B1", 'front_5to1'))
             if config['load_queries']:
                 search.append(Path(base_path, 'query'))
             assert len(search) != 0
-            paths = [p for s in search for p in s.glob('**/*.jpg')]
+            paths = [p for s in search for p in s.glob('**/*.png')]
+            paths2= [p for s in search for p in s.glob('**/*.jpg')]
+            paths+=paths2
 
         data = {'image': [], 'name': []}
         for p in paths:

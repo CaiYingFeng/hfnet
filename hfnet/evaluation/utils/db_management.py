@@ -97,7 +97,7 @@ def build_localization_dbs(db_ids, images, cameras,
                 else:
                     db_image_id = image_id
                 desc = descriptors_from_colmap_db(cursor, db_image_id)
-                assert desc.shape[0] == len(valid)
+                # assert desc.shape[0] == len(valid)
                 desc = desc[valid]
             else:
                 raise ValueError('Local config does not contain predictor '
@@ -150,7 +150,8 @@ def extract_query(data, info, config_global, config_local):
         db_name = config_local.get(
             'colmap_db_queries', config_local['colmap_db'])
         cursor = get_cursor(db_name)
-        db_query_name = info.name
+        db_query_name = info.name[6:]
+        print("----------------------------------------------------------------"+db_query_name+"----------------------------------------------------------------")
         if config_local.get('broken_db', False):
             db_query_name = db_query_name.replace('jpg', 'png')
         if config_local.get('broken_paths', False):

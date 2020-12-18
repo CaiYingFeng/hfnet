@@ -117,17 +117,22 @@ class NetvladOriginal(BaseModel):
 
             x = vggConv(x, '5_1', 512, True)
             x = vggConv(x, '5_2', 512, True)
-            x = vggConv(x, '5_3', 512, False)
+            x = vggConv(x, '5_3', 512, False)#512
             endpoints['conv5_3'] = x
 
             # NetVLAD
-            x = tf.nn.l2_normalize(x, dim=-1)
-            x = vlad_legacy(x, config['num_clusters'])
+            x = tf.nn.l2_normalize(x, dim=-1)#(?,?,?,512)
+            x = vlad_legacy(x, config['num_clusters'])#37268=512*64;(?,32768)
+            
 
             # PCA
-            x = tf.layers.conv2d(tf.expand_dims(tf.expand_dims(x, 1), 1),
-                                 config['pca_dimension'], 1, 1, name='WPCA')
-            x = tf.nn.l2_normalize(tf.layers.flatten(x), dim=-1)
+            x=tf.expand_dims(x, 1)#(?,1,32768)
+            x=tf.expand_dims(x, 1)#(?,1,1,32768)
+            x = tf.layers.conv2d(x,config['pca_dimension'], 1, 1, name='WPCA')#(?,1,1,4096)
+            
+            # x = tf.layers.conv2d(tf.expand_dims(tf.expand_dims(x, 1), 1),
+            #                      config['pca_dimension'], 1, 1, name='WPCA')
+            x = tf.nn.l2_normalize(tf.layers.flatten(x), dim=-1)#(?,4096)
 
         ret = {'global_descriptor': x}
         if config['local_descriptor_layer']:
