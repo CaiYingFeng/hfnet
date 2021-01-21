@@ -2,7 +2,7 @@ data:
     name: 'aachen'
     load_db: true
     load_queries: false
-    resize_max: 960
+    resize_max: 1920
 model:
     name: 'super_point_pytorch'
     nms_radius: 0

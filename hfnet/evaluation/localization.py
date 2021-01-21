@@ -32,6 +32,8 @@ class Localization:
             path=Path(base_path, 'models', model_name).as_posix(), ext='.bin')####################bin和txt
         self.db_ids = np.array(list(self.images.keys()))
         self.db_names = [self.images[i].name for i in self.db_ids]
+        # self.db_names_1 = [self.images[i].name for i in self.db_ids]
+        # self.db_names=[name.strip('db/') for name in self.db_names_1]
 
         # Statistics for debugging
         kpts_per_image = np.median(np.array(
@@ -110,7 +112,7 @@ class Localization:
             self.images, self.points)
 
     def init_queries(self, query_file, query_config, prefix=''):
-        queries = read_query_list(
+        queries = read_query_list(#读querylist中图片名，相机模型，内参
             Path(self.base_path, query_file), prefix=prefix)
         Dataset = get_dataset(query_config.get('name', self.dataset_name))
         query_config = {
@@ -145,12 +147,18 @@ class Localization:
             prior_ids = self.db_ids[indices]
         timings['global'] = t.duration
 
-        # Clustering
+        # # Clustering
         with Timer() as t:
+
             clustered_frames = covis_clustering(
                 prior_ids, self.local_db, self.points)
+            # clustered_frames=[]
+            # for i in range(len(prior_ids.tolist())):
+            #     clustered_frames.append(prior_ids.tolist()[i].tolist())
             local_desc = self.local_transform(query_item.local_desc)
         timings['covis'] = t.duration
+
+        
 
         # Iterative pose estimation
         dump = []
@@ -162,11 +170,13 @@ class Localization:
             matches, place_lms, duration = match_against_place(
                 place, self.local_db, local_desc, config_local['ratio_thresh'],
                 do_fast_matching=config_local.get('fast_matching', True),
+                # do_fast_matching=False,
                 debug_dict=matches_data)
             timings['local'] += duration
 
             # PnP
             if len(matches) > 3:
+                # result = loc_failure
                 with Timer() as t:
                     matched_kpts = query_item.keypoints[matches[:, 0]]
                     matched_lms = np.stack(
@@ -194,8 +204,9 @@ class Localization:
         # In case of failure we return the pose of the first retrieved prior
         if not result.success:
             result = results[0]
+        
             result = LocResult(False, result.num_inliers, result.inlier_ratio,
-                               colmap_image_to_pose(self.images[prior_ids[0]]))
+                                colmap_image_to_pose(self.images[prior_ids[0]]))
 
         if debug:
             debug_data = {

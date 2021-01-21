@@ -3,10 +3,10 @@ import numpy as np
 from collections import namedtuple
 from pathlib import Path
 from tqdm import tqdm
-
+from hfnet.settings import EXPER_PATH
 from hfnet.datasets.colmap_utils.read_model import qvec2rotmat
 from hfnet.utils.tools import Timer  # noqa: F401 (profiling)
-
+import os
 
 colmap_cursors = {}
 
@@ -65,7 +65,10 @@ def build_localization_dbs(db_ids, images, cameras,
     db_iter = dummy_iter(db_ids, images, cameras)
     for i, (image_id, data) in tqdm(enumerate(zip(db_ids, db_iter))):
         # Global
+        # mydb_path = Path(EXPER_PATH, 'exports', 'netvlad/aachen','db', data['name']+'.npz')##为了三帧合并加的，因为合并后一些图在image.bin里面有，而npz是没有的
         if config_global is not None:
+        # if os.path.exists(mydb_path):    
+
             pred = config_global['predictor_db'](
                 data['image'], data['name'], **config_global)
             desc = pred['global_descriptor']

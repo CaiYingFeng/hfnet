@@ -11,7 +11,7 @@ class Aachen(BaseDataset):
         'load_queries': True,
         'image_names': None,
         'grayscale': True,
-        'resize_max': 640,
+        'resize_max': 960,
         'num_parallel_calls': 10,
     }
     dataset_folder = 'aachen/image'

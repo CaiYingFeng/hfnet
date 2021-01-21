@@ -92,9 +92,11 @@ def match_against_place(frame_ids, local_db, query_desc, ratio_thresh,
         place_desc = place_desc.astype(np.float32, copy=False)
         with Timer() as t:
             if do_fast_matching:
+                # print("this is fastmatcher")
                 matches = fast_matching(
                     query_desc, place_desc, ratio_thresh, labels=place_lms)
             else:
+                # print("This is bfmatcher")
                 matcher = cv2.BFMatcher(cv2.NORM_L2)
                 matches = matcher.knnMatch(query_desc, place_desc, k=2)
                 matches1, matches2 = list(zip(*matches))
@@ -129,8 +131,8 @@ def match_against_place(frame_ids, local_db, query_desc, ratio_thresh,
 
 
 def do_pnp(kpts, lms, query_info, config):
-    kpts = kpts.astype(np.float32).reshape((-1, 1, 2))
-    lms = lms.astype(np.float32).reshape((-1, 1, 3))
+    kpts = kpts.astype(np.float32).reshape((-1, 1, 2))#查询图像2d特征点
+    lms = lms.astype(np.float32).reshape((-1, 1, 3))#小地图3d点
 
     success, R_vec, t, inliers = cv2.solvePnPRansac(
         lms, kpts, query_info.K, np.array([query_info.dist, 0, 0, 0]),

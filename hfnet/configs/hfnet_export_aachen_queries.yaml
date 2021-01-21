@@ -2,7 +2,7 @@ data:
     name: 'aachen'
     load_db: false
     load_queries: true
-    resize_max: 960
+    resize_max: 1920
     grayscale: true
 model:
     name: 'hf_net'

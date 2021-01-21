@@ -140,6 +140,8 @@ def export_loader_db(image, name, experiment, **config):
 
     name = name.decode('utf-8') if isinstance(name, bytes) else name
     path = Path(EXPER_PATH, 'exports', experiment,'db', name+'.npz')
+    # path = Path(EXPER_PATH, 'exports', experiment, name+'.npz')
+    
     with np.load(path) as p:
         pred = {k: v.copy() for k, v in p.items()}
     image_shape = image.shape[:2]

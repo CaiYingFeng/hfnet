@@ -121,9 +121,9 @@ def topk_matching(query, database, k):
     '''Retrieve top k matches from a database (shape N x dim) with a single
        query. In order to reduce any overhead, use numpy instead of PyTorch
     '''
-    dist = 2 * (1 - database @ query)
-    ind = np.argpartition(dist, k)[:k]
-    ind = ind[np.argsort(dist[ind])]
+    dist = 2 * (1 - database @ query)#矩阵乘法
+    ind = np.argpartition(dist, k)[:k]#找到k个
+    ind = ind[np.argsort(dist[ind])]#k个排序
     return ind
 
 

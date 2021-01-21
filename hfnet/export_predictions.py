@@ -68,7 +68,9 @@
 #             Path(base_dir, Path(name).parent).mkdir(parents=True, exist_ok=True)
 #             np.savez(Path(base_dir, '{}.npz'.format(name)), **predictions)
 
-
+import sys
+import os
+sys.path.append("./")
 import numpy as np
 import argparse
 import yaml
@@ -86,9 +88,8 @@ from hfnet.datasets import get_dataset  # noqa: E402
 from hfnet.utils import tools  # noqa: E402
 from hfnet.settings import EXPER_PATH, DATA_PATH  # noqa: E402
 
-
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     parser = argparse.ArgumentParser()
     parser.add_argument('method',type=str)
 
@@ -181,7 +182,7 @@ if __name__ == '__main__':
        
         test_set = dataset.get_test_set()
 
-        feature_file = h5py.File(Path(base_dir, 'all_1.h5'), 'a')#生成h5所需
+        # feature_file = h5py.File(Path(base_dir, 'all_1.h5'), 'a')#生成h5所需
 
         for data in tqdm(test_set):
             # print (data)
@@ -190,27 +191,27 @@ if __name__ == '__main__':
 
             predictions = net.predict(data, keys=keys)
             predictions['input_shape'] = data['image'].shape
-            name = data['name'].decode('utf-8')
-            # Path(base_dir, Path(name).parent).mkdir(parents=True, exist_ok=True)
-            # np.savez(Path(base_dir, '{}.npz'.format(name)), **predictions)
+            name = data['name'].decode('utf-8')#name: db/1606404423.00735318
+            Path(base_dir, Path(name).parent).mkdir(parents=True, exist_ok=True)
+            np.savez(Path(base_dir, '{}.npz'.format(name)), **predictions)
 
             ###########################
             ###生成pairs需要的h5文件####
             ###########################
 
-            if(name.split('.',-1)[-1]=='jpg'):
-                name+='.png'
-            else:
-                name+='.jpg'
+            # if(name.split('.',-1)[-1]=='jpg'):
+            #     name+='.png'
+            # else:
+            #     name+='.jpg'
 
-            grp=feature_file.create_group(name)
-            grp.create_dataset('global_descriptor',data=predictions['global_descriptor'])
-            grp.create_dataset('input_shape',data=predictions['input_shape'])
-            break
+            # grp=feature_file.create_group(name)
+            # grp.create_dataset('global_descriptor',data=predictions['global_descriptor'])
+            # grp.create_dataset('input_shape',data=predictions['input_shape'])
+            # break
 
             ##########################
             ##########################
             ##########################
         
-        feature_file.close()
+        # feature_file.close()
     

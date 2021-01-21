@@ -5,7 +5,9 @@ from pprint import pformat
 import yaml
 import numpy as np
 from pyquaternion import Quaternion
-
+import sys
+import os
+sys.path.append("./")
 from hfnet.evaluation.localization import Localization, evaluate
 from hfnet.evaluation.loaders import export_loader,export_loader_db
 from hfnet.settings import EXPER_PATH
@@ -19,7 +21,8 @@ configs_global = {
         'predictor': export_loader,
         'has_keypoints': False,
         'has_descriptors': False,
-        'pca_dim': 1024,
+        # 'pca_dim': 4096,
+        'pca_dim': 4096,
         'num_prior': 10,
     },
     'hfnet': {
@@ -36,7 +39,7 @@ configs_global = {
 
 configs_local = {
     'superpoint': {
-        'db_name': 'localdb_superpoint.pkl',
+        'db_name': 'localdb_superpoint_HL.pkl',
         'experiment': 'superpoint/aachen',
         'predictor_db': export_loader_db,
         'predictor': export_loader,
@@ -58,11 +61,11 @@ configs_local = {
         # 'do_nms': True,
         # 'nms_thresh': 4,
         'num_features': 2000,
-        'ratio_thresh': 0.9,
+        'ratio_thresh': 0.8,
     },
     'sift': {
-        'db_name': 'localdb_sift.pkl',
-        'colmap_db': 'aachen.db',
+        'db_name': 'localdb_sift_seq.pkl',
+        'colmap_db': 'cam03_seq.db',
         'root': False,
         'ratio_thresh': 0.7,
         'fast_matching': False,
@@ -102,14 +105,14 @@ config_pose = {
 }
 
 config_aachen = {
-    'resize_max': 960,
+    'resize_max': 1920,
 }
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('model', type=str)#sfm
-    parser.add_argument('eval_name', type=str)#输出名字
+    parser.add_argument('--model', type=str)#sfm
+    parser.add_argument('--eval_name', type=str)#输出名字
     parser.add_argument('--local_method', type=str)
     parser.add_argument('--global_method', type=str)
     parser.add_argument('--build_db', action='store_true',default='True')
@@ -117,6 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_iter', type=int)
     parser.add_argument('--export_poses', action='store_true',default='True')
     parser.add_argument('--cpp_backend', action='store_true')
+    parser.add_argument('--output_dir',type=str, default=Path(EXPER_PATH, 'eval/aachen'))
     args = parser.parse_args()
 
     config = {
@@ -143,7 +147,12 @@ if __name__ == '__main__':
     logging.info('Evaluation metrics: \n'+pformat(metrics))
 
     output = {'config': config, 'metrics': metrics}
-    output_dir = Path(EXPER_PATH, 'eval/aachen')
+
+    output_dir = Path(args.output_dir, args.eval_name)
+
+
+    # output_dir = Path(EXPER_PATH, 'eval/aachen')
+
     output_dir.mkdir(exist_ok=True, parents=True)
     eval_path = Path(output_dir, f'{args.eval_name}.yaml')
     with open(eval_path, 'w') as f:
